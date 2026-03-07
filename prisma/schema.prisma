@@ -50,6 +50,14 @@ model User {
   notifications      Notification[]
   githubIntegration  GitHubIntegration?
   externalProjects   ExternalProject[]
+
+  // Phase 8 Governance & Security
+  mfaEnabled         Boolean         @default(false)
+  ssoProvider        String?         // e.g., GOOGLE, GITHUB
+  outcomeScore       Float           @default(0.0)
+  learningPaths      LearningPathAssignment[]
+  assignedInvites    UserInvite[]    @relation("InvitedByUser")
+  receivedInvite     UserInvite?     @relation("InvitedUser")
 }
 
 // ----------------------------------------------------
@@ -70,6 +78,7 @@ model Course {
   modules      Module[]
   certificates Certificate[]
   externalProjects ExternalProject[]
+  learningPaths    LearningPathCourse[]
 }
 
 model Module {
@@ -322,6 +331,12 @@ model Organization {
   users       User[]
   courses     Course[]
   departments Department[]
+  learningPaths LearningPath[]
+  invites     UserInvite[]
+
+  // Phase 8 Management
+  seatLimit   Int           @default(10)
+  usedSeats   Int           @default(0)
 }
 
 model GitHubIntegration {
@@ -350,4 +365,61 @@ model ExternalProject {
 
   user           User     @relation(fields: [userId], references: [id])
   course         Course   @relation(fields: [courseId], references: [id])
+}
+
+// ----------------------------------------------------
+// Enterprise Governance (Phase 8)
+// ----------------------------------------------------
+model LearningPath {
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  courses        LearningPathCourse[]
+  assignments    LearningPathAssignment[]
+}
+
+model LearningPathCourse {
+  learningPathId String
+  courseId       String
+  order          Int      // Sequence of courses
+
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id])
+  course         Course       @relation(fields: [courseId], references: [id])
+
+  @@id([learningPathId, courseId])
+}
+
+model LearningPathAssignment {
+  id             String   @id @default(uuid())
+  userId         String
+  learningPathId String
+  status         String   @default("IN_PROGRESS")
+  deadline       DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime @default(now())
+
+  user           User         @relation(fields: [userId], references: [id])
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id])
+}
+
+model UserInvite {
+  id             String   @id @default(uuid())
+  email          String
+  organizationId String
+  role           Role     @default(STUDENT)
+  invitedById    String
+  status         String   @default("PENDING")
+  token          String   @unique
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  acceptedUserId String?  @unique
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  invitedBy      User         @relation("InvitedByUser", fields: [invitedById], references: [id])
+  acceptedUser   User?        @relation("InvitedUser", fields: [acceptedUserId], references: [id])
 }
