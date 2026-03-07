@@ -10,7 +10,8 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000/api/v1',
+        url: '/api/v1',
+        description: 'Auto-detected Server (Local or Production)',
       },
     ],
     components: {
@@ -28,7 +29,11 @@ const options = {
       },
     ],
   },
-  apis: ['./src/modules/**/*.routes.ts', './src/modules/**/*.controller.ts'], // Path to the API docs
+  // Use a broad search to find routes in both src (dev) and dist (prod)
+  apis: [
+    '**/modules/**/*.routes.[tj]s',
+    '**/modules/**/*.controller.[tj]s'
+  ],
 };
 
 export const specs = swaggerJsdoc(options);
