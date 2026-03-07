@@ -4,6 +4,7 @@ import { prisma } from '../../config/db';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 import { AIAnalysisService } from './ai_analysis.service';
 import { AnalyticsService } from '../analytics/analytics.service';
+import { ProgressService } from '../course/progress.service';
 
 const submitCodeSchema = z.object({
   language: z.string(),
@@ -41,6 +42,9 @@ export const IDEController = {
 
       // 3. Update Streak (Phase 4)
       AnalyticsService.updateStreak(studentId).catch(console.error);
+
+      // 4. Mark Lesson as Completed (Phase 9)
+      ProgressService.markAsCompleted(studentId, parsedData.lessonId).catch(console.error);
 
       res.status(201).json({
         message: 'Code submitted successfully. Analysis in progress.',

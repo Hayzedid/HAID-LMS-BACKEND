@@ -1,4 +1,5 @@
 import { prisma } from '../../config/db';
+import { ProgressService } from '../course/progress.service';
 
 export class VideoService {
   static async logHeartbeat(studentId: string, lessonId: string, watchTimeIncrement: number) {
@@ -56,6 +57,18 @@ export class VideoService {
 
     // In a real system, we'd log this attempt to an Attempt table.
     // For now, simple boolean return.
-    return checkpoint.answer.toLowerCase() === submittedAnswer.toLowerCase();
+    const isCorrect = checkpoint.answer.toLowerCase() === submittedAnswer.toLowerCase();
+
+    if (isCorrect) {
+      // Logic: If this was the last checkpoint in the video, mark the lesson as completed
+      const allCheckpoints = await this.getLessonCheckpoints(checkpoint.lessonId);
+      const isLast = allCheckpoints[allCheckpoints.length - 1].id === checkpointId;
+      
+      if (isLast) {
+        await ProgressService.markAsCompleted(studentId, checkpoint.lessonId);
+      }
+    }
+
+    return isCorrect;
   }
 }

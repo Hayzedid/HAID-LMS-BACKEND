@@ -15,6 +15,7 @@ import { aiRoutes } from './modules/ai/ai.routes';
 import { organizationRoutes } from './modules/organization/organization.routes';
 import { githubRoutes } from './modules/github/github.routes';
 import { enterpriseRoutes } from './modules/enterprise/enterprise.routes';
+import { progressRoutes } from './modules/course/progress.routes';
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger';
 import rateLimit from 'express-rate-limit';
@@ -51,6 +52,7 @@ app.use('/api/v1/ai', aiRoutes);
 app.use('/api/v1/organization', organizationRoutes);
 app.use('/api/v1/github', githubRoutes);
 app.use('/api/v1/enterprise', enterpriseRoutes);
+app.use('/api/v1/progress', progressRoutes);
 
 // Basic Health Check
 app.get('/health', (req: Request, res: Response) => {

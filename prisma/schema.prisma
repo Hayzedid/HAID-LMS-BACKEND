@@ -58,6 +58,7 @@ model User {
   learningPaths      LearningPathAssignment[]
   assignedInvites    UserInvite[]    @relation("InvitedByUser")
   receivedInvite     UserInvite?     @relation("InvitedUser")
+  lessonCompletions  LessonCompletion[]
 }
 
 // ----------------------------------------------------
@@ -116,6 +117,7 @@ model Lesson {
   checkpoints     CheckpointQuiz[]
   proctoredExam   ProctoredExam?
   scheduledReviews ScheduledReview[]
+  completions      LessonCompletion[]
 }
 
 // ----------------------------------------------------
@@ -143,6 +145,19 @@ model VideoEvent {
   createdAt      DateTime @default(now())
 
   videoSession   VideoSession @relation(fields: [videoSessionId], references: [id])
+}
+
+model LessonCompletion {
+  id        String   @id @default(uuid())
+  studentId String
+  lessonId  String
+  completed Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  student   User     @relation(fields: [studentId], references: [id])
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+
+  @@unique([studentId, lessonId])
 }
 
 model CheckpointQuiz {

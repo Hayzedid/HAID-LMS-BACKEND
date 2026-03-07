@@ -53,4 +53,21 @@ export class CourseService {
       data,
     });
   }
+
+  static async getLessonById(id: string) {
+    const lesson = await prisma.lesson.findUnique({
+      where: { id },
+      include: {
+        module: {
+          select: { courseId: true, title: true }
+        }
+      }
+    });
+
+    if (!lesson) {
+      throw { status: 404, message: 'Lesson not found' };
+    }
+
+    return lesson;
+  }
 }

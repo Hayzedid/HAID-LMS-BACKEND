@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { CourseService } from './courses.service';
 import { AuthRequest } from '../../middlewares/auth.middleware';
+import { ProgressService } from '../course/progress.service';
 
 const createCourseSchema = z.object({
   title: z.string().min(5),
@@ -98,6 +99,25 @@ export const CourseController = {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: 'Validation failed', details: error.flatten().fieldErrors });
       }
+      next(error);
+    }
+  },
+
+  async getLessonById(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const lessonId = req.params.lessonId as string;
+      const studentId = req.user?.userId;
+
+      const lesson = await CourseService.getLessonById(lessonId);
+
+      // Auto-mark as completed if it's a TEXT lesson
+      if (lesson.type === 'TEXT' && studentId) {
+        await ProgressService.markAsCompleted(studentId, lessonId);
+      }
+
+      res.status(200).json(lesson);
+    } catch (error: any) {
+      if (error.status === 404) return res.status(404).json({ error: error.message });
       next(error);
     }
   }
