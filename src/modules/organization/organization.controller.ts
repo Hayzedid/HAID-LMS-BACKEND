@@ -24,7 +24,7 @@ export const OrganizationController = {
   async getBranding(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { slug } = req.params;
-      const org = await OrganizationService.getBySlug(slug);
+      const org = await OrganizationService.getBySlug(slug as string);
       if (!org) return res.status(404).json({ error: 'Organization not found' });
       res.status(200).json(org);
     } catch (error) {

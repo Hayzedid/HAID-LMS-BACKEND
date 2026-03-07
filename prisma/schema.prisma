@@ -48,6 +48,8 @@ model User {
   certificates       Certificate[]
   transactions       Transaction[]
   notifications      Notification[]
+  githubIntegration  GitHubIntegration?
+  externalProjects   ExternalProject[]
 }
 
 // ----------------------------------------------------
@@ -67,6 +69,7 @@ model Course {
   instructor   User     @relation("InstructorCourses", fields: [instructorId], references: [id])
   modules      Module[]
   certificates Certificate[]
+  externalProjects ExternalProject[]
 }
 
 model Module {
@@ -319,4 +322,32 @@ model Organization {
   users       User[]
   courses     Course[]
   departments Department[]
+}
+
+model GitHubIntegration {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  githubUsername   String
+  accessToken      String   // Encrypted in production
+  refreshToken     String?
+  tokenExpiresAt   DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user             User     @relation(fields: [userId], references: [id])
+}
+
+model ExternalProject {
+  id             String   @id @default(uuid())
+  userId         String
+  courseId       String
+  repoUrl        String
+  branch         String   @default("main")
+  lastSyncAt     DateTime?
+  integrityScore Int?     // Result of AI code analysis
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id])
+  course         Course   @relation(fields: [courseId], references: [id])
 }
