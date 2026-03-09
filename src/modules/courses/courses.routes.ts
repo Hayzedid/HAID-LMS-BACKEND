@@ -68,7 +68,57 @@ router.get('/lesson/:lessonId', authenticate, enforcePrerequisites, CourseContro
  *         description: Course created
  */
 router.post('/', authenticate, authorize(['INSTRUCTOR', 'ADMIN']), CourseController.createCourse as any);
+/**
+ * @swagger
+ * /courses/module:
+ *   post:
+ *     summary: Create a new module in a course
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, order, courseId]
+ *             properties:
+ *               title: { type: string }
+ *               order: { type: number }
+ *               courseId: { type: string, format: uuid }
+ *     responses:
+ *       201:
+ *         description: Module created
+ */
 router.post('/module', authenticate, authorize(['INSTRUCTOR', 'ADMIN']), CourseController.createModule as any);
+
+/**
+ * @swagger
+ * /courses/lesson:
+ *   post:
+ *     summary: Create a new lesson in a module
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, type, order, moduleId]
+ *             properties:
+ *               title: { type: string }
+ *               type: { type: string, enum: [VIDEO, TEXT, CODE] }
+ *               order: { type: number }
+ *               moduleId: { type: string, format: uuid }
+ *               content: { type: string }
+ *               videoUrl: { type: string, format: uri }
+ *     responses:
+ *       201:
+ *         description: Lesson created
+ */
 router.post('/lesson', authenticate, authorize(['INSTRUCTOR', 'ADMIN']), CourseController.createLesson as any);
 
 export const courseRoutes = router;
