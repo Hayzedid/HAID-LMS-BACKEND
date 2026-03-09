@@ -48,7 +48,16 @@ export class CourseService {
     });
   }
 
-  static async createLesson(data: { title: string; type: any; content?: string; videoUrl?: string; order: number; moduleId: string }) {
+  static async createLesson(data: { 
+    title: string; 
+    type: any; 
+    content?: string; 
+    videoUrl?: string; 
+    audioUrl?: string; 
+    attachmentUrl?: string; 
+    order: number; 
+    moduleId: string 
+  }) {
     return await prisma.lesson.create({
       data,
     });

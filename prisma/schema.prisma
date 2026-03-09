@@ -98,18 +98,21 @@ enum LessonType {
   VIDEO
   TEXT
   CODE
+  AUDIO
 }
 
 model Lesson {
-  id        String     @id @default(uuid())
-  title     String
-  type      LessonType
-  content   String?    // Text or generic content
-  videoUrl  String?    // If VIDEO
-  order     Int
-  moduleId  String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id          String     @id @default(uuid())
+  title       String
+  type        LessonType
+  content     String?    @db.Text // Support long-form typed content
+  videoUrl    String?    // If VIDEO
+  audioUrl    String?    // If AUDIO
+  attachmentUrl String?  // Optional supplemental file
+  order       Int
+  moduleId    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   module          Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   ideSubmissions  IDESubmission[]

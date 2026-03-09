@@ -16,6 +16,8 @@ import { organizationRoutes } from './modules/organization/organization.routes';
 import { githubRoutes } from './modules/github/github.routes';
 import { enterpriseRoutes } from './modules/enterprise/enterprise.routes';
 import { progressRoutes } from './modules/course/progress.routes';
+import { mediaRoutes } from './modules/media/media.routes';
+import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger';
 import rateLimit from 'express-rate-limit';
@@ -33,6 +35,9 @@ const limiter = rateLimit({
 app.use(cors());
 app.use(express.json());
 app.use(limiter);
+
+// Serve uploads statically
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // API Documentation (Phase 6)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
@@ -53,6 +58,7 @@ app.use('/api/v1/organization', organizationRoutes);
 app.use('/api/v1/github', githubRoutes);
 app.use('/api/v1/enterprise', enterpriseRoutes);
 app.use('/api/v1/progress', progressRoutes);
+app.use('/api/v1/media', mediaRoutes);
 
 // Basic Health Check
 app.get('/health', (req: Request, res: Response) => {

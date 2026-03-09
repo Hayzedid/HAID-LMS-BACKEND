@@ -9,6 +9,7 @@ export interface AuthRequest extends Request {
     role: string;
     organizationId?: string;
   };
+  file?: Express.Multer.File;
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {

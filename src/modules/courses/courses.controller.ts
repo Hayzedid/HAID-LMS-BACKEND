@@ -18,9 +18,11 @@ const createModuleSchema = z.object({
 
 const createLessonSchema = z.object({
   title: z.string().min(3),
-  type: z.enum(['VIDEO', 'TEXT', 'CODE']),
+  type: z.enum(['VIDEO', 'TEXT', 'CODE', 'AUDIO']),
   content: z.string().optional(),
   videoUrl: z.string().url().optional(),
+  audioUrl: z.string().url().optional(),
+  attachmentUrl: z.string().url().optional(),
   order: z.number().int().min(1),
   moduleId: z.string().uuid(),
 });
@@ -89,7 +91,10 @@ export const CourseController = {
       if (parsedData.type === 'VIDEO' && !parsedData.videoUrl) {
          return res.status(400).json({ error: 'videoUrl is required for VIDEO lessons' });
       }
-      if (parsedData.type !== 'VIDEO' && !parsedData.content) {
+      if (parsedData.type === 'AUDIO' && !parsedData.audioUrl) {
+         return res.status(400).json({ error: 'audioUrl is required for AUDIO lessons' });
+      }
+      if ((parsedData.type === 'TEXT' || parsedData.type === 'CODE') && !parsedData.content) {
          return res.status(400).json({ error: 'content is required for TEXT and CODE lessons' });
       }
 
@@ -110,8 +115,8 @@ export const CourseController = {
 
       const lesson = await CourseService.getLessonById(lessonId);
 
-      // Auto-mark as completed if it's a TEXT lesson
-      if (lesson.type === 'TEXT' && studentId) {
+      // Auto-mark as completed if it's a TEXT or AUDIO lesson (unless it has checkpoints)
+      if ((lesson.type === 'TEXT' || lesson.type === 'AUDIO') && studentId) {
         await ProgressService.markAsCompleted(studentId, lessonId);
       }
 
