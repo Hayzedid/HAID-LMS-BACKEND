@@ -116,7 +116,7 @@ export const CourseController = {
       const lesson = await CourseService.getLessonById(lessonId);
 
       // Auto-mark as completed if it's a TEXT or AUDIO lesson (unless it has checkpoints)
-      if ((lesson.type === 'TEXT' || lesson.type === 'AUDIO') && studentId) {
+      if (((lesson.type as string) === 'TEXT' || (lesson.type as string) === 'AUDIO') && studentId) {
         await ProgressService.markAsCompleted(studentId, lessonId);
       }
 
